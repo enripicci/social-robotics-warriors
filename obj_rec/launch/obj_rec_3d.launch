@@ -1,0 +1,20 @@
+<launch>
+
+  <remap from="/video" to="/camera/rgb/image_color" />
+  <remap from="/points" to="/camera/depth_registered/points" />
+  
+  <!-- object recognition -->
+  <node pkg="obj_rec" type="recognition" name="recognition" respawn="true" output="screen"/>
+
+  <!-- object recognition setup -->
+  <node pkg="obj_rec" type="setup" name="setup" respawn="true" output="screen"/>
+
+  <!-- 2d percepts to 3d -->
+  <node pkg="obj_rec" type="percept3d" name="percept3d" respawn="true" output="screen"/>
+
+
+  <!-- Attach openni_depth_frame tf to camera_depth_frame tf -->
+  <node pkg="tf" type="static_transform_publisher" name="openni_tracker_static_transform_publisher"
+    args="0 0 0 0 0 0 camera_rgb_optical_frame obj_frame 100" respawn="true"/>
+
+</launch>

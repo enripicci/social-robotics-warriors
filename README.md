@@ -39,7 +39,7 @@ Ora possiamo lavorare su di esso:
     $ cd social-robotics-warriors
 
 --------------------------------------------------------------------------------
-  1.1  Modificare i files
+  1.1  Informazioni sul repository
 --------------------------------------------------------------------------------
 
 Ora GIT ci permette di modificare i fiels in locale.
@@ -54,6 +54,16 @@ Usare il comando
     $ git status
 
 per visualizzare lo stato dei files nel repository.
+
+    $ git diff
+    $ git diff --staged
+
+visualizzano informazioni molto dettagliate sui files modificati ed in stage,
+rispettivamente.
+
+--------------------------------------------------------------------------------
+  1.2  Modificare i files
+--------------------------------------------------------------------------------
 
 Per aggiungere nuovi files, o per impostare un file modificato come staged,
 il comando è:
@@ -70,8 +80,47 @@ il comando è:
     |         modifiche-sul-repository                                    |
     #=====================================================================#
 
+Una volta che tutti i file voluti sono impostati come stage, allora è il momento
+di eseguire il commit.
+Il commit corrisponde a salvare una nuova versione dei file, e viene effettuato
+SOLAMENTE con i file in stage, NON con i semplici files modificati.
+Il commit dovrebbe corrispondere ad un'avanzamento logico nella stesura del
+programma, avanzamento che deve essere descritto da un commento.
+
+    $ git commit -m "commento sul commit"
+    $ git commit
 
 
+    #=====================================================================#
+    | NOTA: siccome la procedura di passaggio attraverso lo stage può     |
+    | essere complicata e disagevole, il comando:                         |
+    |                                                          .          |
+    |   $ git commit -a -m "commento sul commit"                          |
+    |   $ git commit -a                                                   |
+    |                                                                     |
+    | permette di includere nel commit pure tutti i file impostati come   |
+    | modified, senza doverli prima marcare come stage.                   |
+    #=====================================================================#
 
+--------------------------------------------------------------------------------
+  1.2  Rimuovere i files
+--------------------------------------------------------------------------------
+
+La rimozione dei files deve per forza passare attraverso l'area di stage.
+Non è difatti sufficiente eliminarlo dal repository.
+Il comando corrispondente è:
+
+    $ git rm <nomefile>
+
+che rimuoverà automaticamente il file dal repository, e ne terrà traccia deell'
+eliminazione al prossimo commit.
+
+    $ git rm --cached <nomefile>
+
+è utilizzato per rimuovere un file dall'area di stage, senza rimuoverlo
+fisicamente dal repository.
+
+
+    
 
 

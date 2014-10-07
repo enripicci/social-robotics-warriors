@@ -26,13 +26,6 @@ class ColorTable {
 	    
 	    /**   Samples manager
 	    **/
-        /* Return the ColorClass that suite better the supplied color.
-        *  radius is the treshold inside which the research is done.
-        *  Return 0 on error, the color class otherwise
-        */
-        /// TODO: check if the return value for error is usable for that scope
-	    ColorClass getColorClass( const CvScalar color, double radius = 10.0);
-	    
 	    /* Add a new sample with id colorClass and color color, RGB coded.
 	    *  Return false on error, true otherwise.
 	    */
@@ -44,9 +37,11 @@ class ColorTable {
 	    
 	    /**   Color map manager
 	    **/
-        /* Map the sample with specified id to the specified color.
+        /* Map the colorId with the RGB color value supplied in color variable.
+        *  The flag seg determine if the colorId is considered or no in the
+        *  runs computation (see class Blob for specific details).
         */
-	    void setColorClassSpecifics( ColorClass id, CvScalar color, bool seg = true);
+	    void setColorClassSpecifics( ColorClass colorId, CvScalar color, bool seg = true);
 	    
 	    /* Clear the color map
 	    */
@@ -61,15 +56,26 @@ class ColorTable {
         */
 	    int segment( const IplImage * in, const IplImage * out, int d_x = 1, int d_y = 1);
 	    
-	    /* 
+	    /* Return the RGB encoding of the specified colorId
 	    */
 	    inline CvScalar getRGB( const ColorClass c) { 
 	        return cvScalar(colorTable[c].b, colorTable[c].g, colorTable[c].r);
 	    }
 	    
-	    /*
+	    /* Test if the colorId c is used for compute the Runs.
 	    */
 	    inline bool isSeg( const ColorClass c ) { return colorTable[c].seg; }
+	    
+	    /* Return the ColorClass that suite better the supplied color.
+        *  radius is the treshold inside which the research is done.
+        *  Return 0 on error, the color class otherwise
+        */
+        /// TODO: check if the return value for error is usable for that scope
+	    ColorClass getColorClass( const CvScalar color, double radius = 10.0);
+	    
+	    /* As the previous, but read the color from the pixel's image at position (x,y)
+	    */
+	    ColorClass getColorClass( const IplImage * in, int x, int y, double radius = 10.0 );
 	    
 	    /* Load a color map from a file.
 	    */

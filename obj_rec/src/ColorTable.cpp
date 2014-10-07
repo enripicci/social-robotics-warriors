@@ -78,6 +78,11 @@ ColorClass ColorTable::getColorClass( CvScalar color, double radius) {
 	return retVal;
 }
 
+ColorClass ColorTable::getColorClass( const IplImage * in, int x, int y, double radius = 10.0 ) {
+    uchar *ptr = PIXEL(in,x,y);
+    return getColorClass( cvScalar( ptr[0], ptr[1], ptr[2]), radius );
+}
+
 
 bool ColorTable::addSample( ColorClass colorClass, CvScalar color) {
     int res;

@@ -39,18 +39,18 @@ bool Blob::isNear( Blob & blob, const int d_x, const int d_y) {
     register int i;
     register int j;
     int diff_left, diff_right;
-    
+
 	for( i = 0; i < (int)runs.size(); i++) {
 	    for( j = 0; j < (int) blob.runs.size(); j++) {
 		    if( fabs(runs[i].y - blob.runs[j].y) < d_y) {
-		        
+
 		        diff_left = (runs[i].x - d_x) - (blob.runs[j].x + blob.runs[j].len);
 		        diff_right = (runs[i].x + runs[i].len + d_x) - (blob.runs[j].x);
-		        
+
 		        if((diff_left * diff_right) < 0)
 		            return true;
 		        return false;
-		        
+
 		    /*
 		        if(( runs[i].x -d_x <= blob.runs[j].x) &&
 				    ( runs[i].x + runs[i].len + d_x >= blob.runs[j].x) ) return true;
@@ -87,7 +87,7 @@ bool Blob::merge( Run run, int d_y) {
     register int i;
 
 	runs.push_back(run);
-	
+
     if( false == runs.empty() ) {
         // update the bbox
 	    if( run.x < top_left.x)
@@ -128,18 +128,18 @@ CvPoint Blob::getAvg() {
 
 
 CvSeq * Blob::getEdges() {
-	CvSeq* ptseq = cvCreateSeq( CV_SEQ_KIND_GENERIC|CV_32SC2, 
+	CvSeq* ptseq = cvCreateSeq( CV_SEQ_KIND_GENERIC|CV_32SC2,
 	                            sizeof(CvContour),
 							    sizeof(CvPoint),
-							    cvCreateMemStorage() ); 
+							    cvCreateMemStorage() );
 	CvPoint pt;
-	
+
 	for( vector <Run>::iterator it = runs.begin(); it != runs.end(); it++) {
 	    // left extreme
 		pt.x = it->x;
 		pt.y = it->y;
 		cvSeqPush( ptseq, &pt );
-		
+
 		// right extreme
 		pt.x += it->len;
 		cvSeqPush( ptseq, &pt );
@@ -179,6 +179,7 @@ bool Blob::operator== ( const Blob &blob) {
 list < Blob > Blob::extractBlobs( IplImage * image, ColorTable & colorTable, int d_x, int d_y) {
 	list < Blob > blobs;
 	list < Blob >::reverse_iterator it; // use reverse iterator for improve efficiency
+	list < Blob >::reverse_iterator current;
 	Run run;
 	register int y;
 	register int x;
@@ -186,7 +187,7 @@ list < Blob > Blob::extractBlobs( IplImage * image, ColorTable & colorTable, int
 
 	for( y = 0; y < image->height; y += d_y) {
 	    for( x = 0; x < image->width; x += d_x) {
-	    
+
 		    c = colorTable.getColorClass(image,x,y);
 
 		    if( true == colorTable.isSeg(c) ) {
@@ -194,7 +195,7 @@ list < Blob > Blob::extractBlobs( IplImage * image, ColorTable & colorTable, int
 			    run.x = x;
 			    run.y = y;
 			    run.len = 0;
-			    
+
 			    for( x+=d_x ; (x < image->width) && (c == colorTable.getColorClass(image,x,y)) ; x+=d_x, run.len+=d_x) {
 			        // nothing to do here.
 			    }
@@ -202,13 +203,14 @@ list < Blob > Blob::extractBlobs( IplImage * image, ColorTable & colorTable, int
 			    // Create a blob and insert it into the list. It can be accessed with blobs.back() method.
 			    Blob tmp( run, c, d_y + d_y /2);
 			    blobs.push_back(tmp);
+			    current = blobs.rbegin();
 
-			    for( it = (blobs.rbegin() + 1); it != blobs.rend(); it++) {
+			    for( it = (current + 1); it != blobs.rend(); it++) {
 				    // merge near blobs
-				    if( (it->getColorClass() == c) && ( it->isNear(blobs.back(),d_x + d_x /2,d_y + d_y /2))) {
-					    it->merge(blobs.back(), d_y + d_y /2);
-					    blobs.pop_back();
-					    break;
+				    if( (it->getColorClass() == c) && ( it->isNear(current,d_x + d_x /2,d_y + d_y /2)) ) {
+					    it->merge(current, d_y + d_y /2);
+					    blobs.erase(it);
+					    current = it;
 				    }
 			    }
 		    }
@@ -223,7 +225,7 @@ void Blob::drawBlobs( ColorTable & colorTable, list< Blob > & blobs, IplImage * 
     CvSeq * hull
     CvPoint pt0, pt1;
 	list< Blob >::iterator b_it;
-	
+
 	for( b_it = blobs.begin(); b_it != blobs.end(); b_it++) {
 
 		if(b_it->getArea() > minArea) {
@@ -232,7 +234,7 @@ void Blob::drawBlobs( ColorTable & colorTable, list< Blob > & blobs, IplImage * 
 			for( int i = 0; i < hull->total; i++ ) {
 				pt0 = **CV_GET_SEQ_ELEM( CvPoint *, hull, i );
 				pt1 = **CV_GET_SEQ_ELEM( CvPoint *, hull, (i+1)%(hull->total) );
-				
+
 				// paint something
 				cvCircle( img, pt0, 2, colorTable.getRGB(b.color));
 				cvLine( img, pt0, pt1, colorTable.getRGB(b.color), 1);
